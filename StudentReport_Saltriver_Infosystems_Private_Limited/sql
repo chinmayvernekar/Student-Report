@@ -1,0 +1,86 @@
+create table student(
+	id SERIAL PRIMARY KEY,
+	name varchar(50),
+	roll_no int,
+	college varchar(50),
+	physics decimal,
+	chemistry decimal,
+	biology decimal,
+	maths decimal,
+	english decimal,
+	computers decimal
+)
+
+ALTER TABLE student 
+ALTER COLUMN roll_no TYPE int USING roll_no::integer;
+
+ALTER TABLE student ADD rank int;
+ALTER TABLE student ADD ranking varchar(50);
+
+select *, (physics + chemistry + biology + maths + english + computers) as tot_marks  from student
+
+select (physics + chemistry + biology + maths + english + computers) as tot_marks from student limit 11
+
+select (physics + chemistry + biology + maths + english + computers) as tot_marks,
+round((((physics + chemistry + biology + maths + english + computers)  / 600) * 100) , 2) as perc from student limit 11
+
+ select * from student;
+ 
+UPDATE public.student
+SET percentage=round((((physics + chemistry + biology + maths + english + computers)  / 600) * 100) , 2) , 
+tot_marks=(physics + chemistry + biology + maths + english + computers) 
+
+select count(percentage) as total_students, 
+count(percentage) filter (where percentage > 80) as gold,
+count(percentage) filter (where percentage between 60 and 80) as silver
+from student
+
+select * from student where 
+
+with CTE1 as (
+select *, 
+CASE
+        WHEN percentage > 80 THEN 'gold'
+        WHEN percentage between 60 and 80 THEN 'silver'
+		WHEN percentage between 35 and 60 THEN 'bronze'
+        ELSE NULL
+    END AS ranking2
+from student)	,
+CTE2 as (
+SELECT cte1.*, 
+  rank() OVER (PARTITION BY ranking2 ORDER BY cte1.percentage DESC) 
+  FROM cte1 
+---  order by cte1.ranking, rank
+)
+UPDATE public.student t1
+	SET  ranking= cte2.ranking2
+	, ranks=cte2.rank
+from cte2
+where t1.id=cte2.id
+
+select cte2.* from cte2 where rank < 4  
+  
+  
+  
+  
+ UPDATE t1
+SET t1.c1 = new_value
+FROM t2
+WHERE t1.c2 = t2.c2;
+  
+  
+  
+  
+  select ranked_scores.* from 
+(SELECT score_data.*,
+  rank() OVER (PARTITION BY job_id ORDER BY score DESC)
+  FROM score_data) ranked_scores 
+where rank <=3
+
+
+
+
+
+
+
+
